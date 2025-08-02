@@ -6,6 +6,8 @@ const mongoose = require("mongoose");
 
 
 const adminAuthRoutes = require("./routes/auth.routes");
+const zoneRoutes = require("./routes/zone.routes"); // ✅ Zone routes
+const staffRoutes = require("./routes/staff.routes");
 
 
 // Load env variables
@@ -20,6 +22,9 @@ app.use(express.json()); // to parse JSON body
 
 
 app.use("/api/admin", adminAuthRoutes); // <== Admin Auth routes
+app.use("/api/zone", zoneRoutes); // ✅ Zone routes
+app.use("/api/staff", staffRoutes); // ✅ Mount staff routes
+
 
 
 

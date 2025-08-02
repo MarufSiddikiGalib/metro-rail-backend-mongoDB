@@ -1,42 +1,37 @@
-const getConnection = require("../config/db");
+const mongoose = require("mongoose");
 
+// Mongoose schema for Staff
+const staffSchema = new mongoose.Schema({
+  role: {
+    type: String,
+    required: true,
+  },
+  assignedShift: {
+    type: String,
+    required: true,
+  },
+});
+
+// Model: Staff
+const Staff = mongoose.model("Staff", staffSchema);
+
+// 🔁 Get all staff, sorted by creation order
 exports.getAllStaff = async () => {
-  const conn = await getConnection();
-  const result = await conn.execute("SELECT * FROM Staff ORDER BY StaffId");
-  await conn.close();
-  return result.rows;
+  return await Staff.find().sort({ _id: 1 });
 };
 
-exports.createStaff = async (role, shift) => {
-  const conn = await getConnection();
-  const result = await conn.execute(
-    `INSERT INTO Staff (StaffId, Role, AssignedShift)
-     VALUES (seq_StaffId.NEXTVAL, :role, :shift)`,
-    [role, shift],
-    { autoCommit: true }
-  );
-  await conn.close();
-  return result;
+//  Create a new staff member
+exports.createStaff = async (role, assignedShift) => {
+  const newStaff = new Staff({ role, assignedShift });
+  return await newStaff.save();
 };
 
-exports.updateStaff = async (id, role, shift) => {
-  const conn = await getConnection();
-  const result = await conn.execute(
-    `UPDATE Staff SET Role = :role, AssignedShift = :shift WHERE StaffId = :id`,
-    [role, shift, id],
-    { autoCommit: true }
-  );
-  await conn.close();
-  return result;
+// Update a staff member by ID
+exports.updateStaff = async (id, role, assignedShift) => {
+  return await Staff.findByIdAndUpdate(id, { role, assignedShift }, { new: true });
 };
 
+// Delete a staff member by ID
 exports.deleteStaff = async (id) => {
-  const conn = await getConnection();
-  const result = await conn.execute(
-    `DELETE FROM Staff WHERE StaffId = :id`,
-    [id],
-    { autoCommit: true }
-  );
-  await conn.close();
-  return result;
+  return await Staff.findByIdAndDelete(id);
 };

@@ -1,5 +1,6 @@
 const ZoneModel = require("../models/zone.model");
 
+// GET /api/zone — Get all zones
 exports.getAllZone = async (req, res) => {
   try {
     const data = await ZoneModel.getAllZone();
@@ -9,6 +10,7 @@ exports.getAllZone = async (req, res) => {
   }
 };
 
+// POST /api/zone — Create new zone
 exports.createZone = async (req, res) => {
   const { ZoneName } = req.body;
   if (!ZoneName) return res.status(400).json({ error: "Missing Zone Name" });
@@ -21,23 +23,29 @@ exports.createZone = async (req, res) => {
   }
 };
 
+// PUT /api/zone/:id — Update zone
 exports.updateZone = async (req, res) => {
   const { id } = req.params;
   const { ZoneName } = req.body;
 
   try {
-    await ZoneModel.updateZone(id, ZoneName);
+    const updatedZone = await ZoneModel.updateZone(id, ZoneName);
+    if (!updatedZone) return res.status(404).json({ error: "Zone not found" });
+
     res.json({ message: "Zone updated" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
+// DELETE /api/zone/:id — Delete zone
 exports.deleteZone = async (req, res) => {
   const { id } = req.params;
 
   try {
-    await ZoneModel.deleteZone(id);
+    const deletedZone = await ZoneModel.deleteZone(id);
+    if (!deletedZone) return res.status(404).json({ error: "Zone not found" });
+
     res.json({ message: "Zone deleted" });
   } catch (err) {
     res.status(500).json({ error: err.message });
