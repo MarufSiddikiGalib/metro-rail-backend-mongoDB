@@ -2,11 +2,11 @@ const mongoose = require("mongoose");
 
 // Mongoose schema for Staff
 const staffSchema = new mongoose.Schema({
-  role: {
+  ROLE: {
     type: String,
     required: true,
   },
-  assignedShift: {
+  ASSIGNEDSHIFT: {
     type: String,
     required: true,
   },
@@ -21,14 +21,14 @@ exports.getAllStaff = async () => {
 };
 
 //  Create a new staff member
-exports.createStaff = async (role, assignedShift) => {
-  const newStaff = new Staff({ role, assignedShift });
+exports.createStaff = async (ROLE, ASSIGNEDSHIFT) => {
+  const newStaff = new Staff({ ROLE, ASSIGNEDSHIFT });
   return await newStaff.save();
 };
 
 // Update a staff member by ID
-exports.updateStaff = async (id, role, assignedShift) => {
-  return await Staff.findByIdAndUpdate(id, { role, assignedShift }, { new: true });
+exports.updateStaff = async (id, ROLE, ASSIGNEDSHIFT) => {
+  return await Staff.findByIdAndUpdate(id, { ROLE, ASSIGNEDSHIFT }, { new: true });
 };
 
 // Delete a staff member by ID

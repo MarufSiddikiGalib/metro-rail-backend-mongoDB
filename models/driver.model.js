@@ -1,42 +1,50 @@
-const getConnection = require("../config/db");
+const mongoose = require("mongoose");
 
+// Mongoose schema for Driver
+const driverSchema = new mongoose.Schema({
+  CONTACTINFO: {
+    type: String,
+    required: true,
+  },
+  EXPERIENCE: {
+    type: Number,
+    required: true,
+  },
+  NAME: {
+    type: String,
+    required: true,
+  },
+  LICENSENUMBER: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+});
+
+// Model: Driver
+const Driver = mongoose.model("Driver", driverSchema);
+
+// 🔁 Get all drivers, sorted by creation order
 exports.getAllDriver = async () => {
-  const conn = await getConnection();
-  const result = await conn.execute("SELECT * FROM Driver ORDER BY DriverId");
-  await conn.close();
-  return result.rows;
+  return await Driver.find().sort({ _id: 1 });
 };
 
-exports.createDriver = async (contactInfo,  experience, name, licenseNumber ) => {
-  const conn = await getConnection();
-  const result = await conn.execute(
-    `INSERT INTO Driver (DriverId, ContactInfo,  Experience, Name, LicenseNumber)
-     VALUES (seq_DriverId.NEXTVAL, :contactInfo, :experience, :name, :licenseNumber)`,
-    [contactInfo,  experience, name, licenseNumber],
-    { autoCommit: true }
+// 🆕 Create a new driver
+exports.createDriver = async (CONTACTINFO, EXPERIENCE, NAME, LICENSENUMBER) => {
+  const newDriver = new Driver({ CONTACTINFO, EXPERIENCE, NAME, LICENSENUMBER });
+  return await newDriver.save();
+};
+
+// ✏️ Update a driver by ID
+exports.updateDriver = async (id, CONTACTINFO, EXPERIENCE, NAME, LICENSENUMBER) => {
+  return await Driver.findByIdAndUpdate(
+    id,
+    { CONTACTINFO, EXPERIENCE, NAME, LICENSENUMBER },
+    { new: true }
   );
-  await conn.close();
-  return result;
 };
 
-exports.updateDriver = async (id, contactInfo,  experience, name, licenseNumber) => {
-  const conn = await getConnection();
-  const result = await conn.execute(
-    `UPDATE Driver SET ContactInfo = :contactInfo, Experience = :experience, Name = :name, LicenseNumber = :licenseNumber WHERE DriverId = :id`,
-    [ contactInfo,  experience, name, licenseNumber, id],
-    { autoCommit: true }
-  );
-  await conn.close();
-  return result;
-};
-
+// ❌ Delete a driver by ID
 exports.deleteDriver = async (id) => {
-  const conn = await getConnection();
-  const result = await conn.execute(
-    `DELETE FROM Driver WHERE DriverId = :id`,
-    [id],
-    { autoCommit: true }
-  );
-  await conn.close();
-  return result;
+  return await Driver.findByIdAndDelete(id);
 };

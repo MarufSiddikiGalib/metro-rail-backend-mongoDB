@@ -3,11 +3,15 @@ const express = require("express");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const mongoose = require("mongoose");
+const cors = require("cors");
 
 
 const adminAuthRoutes = require("./routes/auth.routes");
 const zoneRoutes = require("./routes/zone.routes"); // ✅ Zone routes
 const staffRoutes = require("./routes/staff.routes");
+const driverRoutes = require("./routes/driver.routes"); // ✅ Driver routes
+const passengerRoutes = require("./routes/passenger.routes"); // ✅ Passenger routes
+const StationRoutes = require("./routes/station.routes"); // ✅ station routes
 
 
 // Load env variables
@@ -17,6 +21,12 @@ dotenv.config();
 connectDB();
 
 const app = express();
+
+app.use(cors({
+  origin: "http://localhost:3000", // your React or frontend dev server
+  //credentials: true // only if you use cookies or sessions
+}));
+
 app.use(express.json()); // to parse JSON body
 
 
@@ -24,7 +34,9 @@ app.use(express.json()); // to parse JSON body
 app.use("/api/admin", adminAuthRoutes); // <== Admin Auth routes
 app.use("/api/zone", zoneRoutes); // ✅ Zone routes
 app.use("/api/staff", staffRoutes); // ✅ Mount staff routes
-
+app.use("/api/driver", driverRoutes); // ✅ Driver routes
+app.use('/api/passenger', passengerRoutes); // ✅ Passenger routes);
+app.use("/api/station", StationRoutes); // <== Admin Station routes
 
 
 
