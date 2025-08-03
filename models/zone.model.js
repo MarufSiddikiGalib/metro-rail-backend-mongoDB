@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 // Mongoose schema for Zone
 const zoneSchema = new mongoose.Schema({
-  ZoneName: {
+  ZONENAME: {
     type: String,
     required: true,
   },
@@ -11,23 +11,20 @@ const zoneSchema = new mongoose.Schema({
 // Model: Zone
 const Zone = mongoose.model("Zone", zoneSchema);
 
-//Get all zones, sorted by creation order
-exports.getAllZone = async () => {
-  return await Zone.find().sort({ _id: 1 });
-};
-
-// Create a new zone
-exports.createZone = async (name) => {
-  const newZone = new Zone({ ZoneName: name });
-  return await newZone.save();
-};
-
-// Update a zone by ID
-exports.updateZone = async (id, name) => {
-  return await Zone.findByIdAndUpdate(id, { ZoneName: name }, { new: true });
-};
-
-// Delete a zone by ID
-exports.deleteZone = async (id) => {
-  return await Zone.findByIdAndDelete(id);
+// Export both the model and the CRUD functions as an object
+module.exports = {
+  Zone, // for direct model access (e.g., .findById)
+  getAllZone: async () => {
+    return await Zone.find().sort({ _id: 1 });
+  },
+  createZone: async (name) => {
+    const newZone = new Zone({ ZONENAME: name });
+    return await newZone.save();
+  },
+  updateZone: async (id, name) => {
+    return await Zone.findByIdAndUpdate(id, { ZONENAME: name }, { new: true });
+  },
+  deleteZone: async (id) => {
+    return await Zone.findByIdAndDelete(id);
+  },
 };

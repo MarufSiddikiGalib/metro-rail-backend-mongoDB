@@ -1,42 +1,41 @@
-const getConnection = require("../config/db");
+const mongoose = require("mongoose");
 
+// Mongoose schema for Passengers
+const passengerSchema = new mongoose.Schema({
+  NAME: {
+    type: String,
+    required: true,
+  },
+  ADDRESS: {
+    type: String,
+    required: true,
+  },
+});
+
+// Model: Passenger
+const Passenger = mongoose.model("Passenger", passengerSchema);
+
+// 🔁 Get all passengers, sorted by creation order
 exports.getAllPassengers = async () => {
-  const conn = await getConnection();
-  const result = await conn.execute("SELECT * FROM Passengers ORDER BY PassengerId");
-  await conn.close();
-  return result.rows;
+  return await Passenger.find().sort({ _id: 1 });
 };
 
-exports.createPassenger = async (name, address) => {
-  const conn = await getConnection();
-  const result = await conn.execute(
-    `INSERT INTO Passengers (PassengerId, Name, Address)
-     VALUES (seq_PassengerId.NEXTVAL, :name, :address)`,
-    [name, address],
-    { autoCommit: true }
+// 🆕 Create a new passenger
+exports.createPassenger = async (NAME, ADDRESS) => {
+  const newPassenger = new Passenger({ NAME, ADDRESS });
+  return await newPassenger.save();
+};
+
+// ✏️ Update a passenger by ID
+exports.updatePassenger = async (id, NAME, ADDRESS) => {
+  return await Passenger.findByIdAndUpdate(
+    id,
+    { NAME, ADDRESS },
+    { new: true }
   );
-  await conn.close();
-  return result;
 };
 
-exports.updatePassenger = async (id, name, address) => {
-  const conn = await getConnection();
-  const result = await conn.execute(
-    `UPDATE Passengers SET Name = :name, Address = :address WHERE PassengerId = :id`,
-    [name, address, id],
-    { autoCommit: true }
-  );
-  await conn.close();
-  return result;
-};
-
+// ❌ Delete a passenger by ID
 exports.deletePassenger = async (id) => {
-  const conn = await getConnection();
-  const result = await conn.execute(
-    `DELETE FROM Passengers WHERE PassengerId = :id`,
-    [id],
-    { autoCommit: true }
-  );
-  await conn.close();
-  return result;
+  return await Passenger.findByIdAndDelete(id);
 };
