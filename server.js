@@ -12,6 +12,8 @@ const staffRoutes = require("./routes/staff.routes");
 const driverRoutes = require("./routes/driver.routes"); // ✅ Driver routes
 const passengerRoutes = require("./routes/passenger.routes"); // ✅ Passenger routes
 const StationRoutes = require("./routes/station.routes"); // ✅ station routes
+const stationRoutes = require("./routes/user/station.routes"); // <== Station routes user 
+const fareRoutes = require("./routes/user/fare.routes"); // <== User Fare routes
 
 
 // Load env variables
@@ -37,6 +39,8 @@ app.use("/api/staff", staffRoutes); // ✅ Mount staff routes
 app.use("/api/driver", driverRoutes); // ✅ Driver routes
 app.use('/api/passenger', passengerRoutes); // ✅ Passenger routes);
 app.use("/api/station", StationRoutes); // <== Admin Station routes
+app.use("/api/stations", stationRoutes); // <== User Station routes
+app.use("/api/fare", fareRoutes); // <== User Fare routes
 
 
 

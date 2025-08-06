@@ -1,11 +1,35 @@
-const getConnection = require("../../config/db");
+const mongoose = require("mongoose");
 
-// Fetch all available schedules
+const scheduleSchema = new mongoose.Schema({
+  arrivalTime: {
+    type: Date,
+    required: true,
+  },
+  departureTime: {
+    type: Date,
+    required: true,
+  },
+  frequency: {
+    type: String,
+    required: true,
+  },
+  trainId: {
+    type: String,// Assuming trainId is a string, you can change this to ObjectId if you have
+    required: true,
+  },
+});
+
+// Create the Schedule model (this will create the 'schedules' collection in MongoDB Atlas)
+const Schedule = mongoose.model("Schedule", scheduleSchema);
+
+
 exports.getAllSchedules = async () => {
-  const connection = await getConnection();
-  const result = await connection.execute(
-    "SELECT ScheduleId, ArrivalTime, DepartureTime, Frequency, TrainId FROM Schedule"
-  );
-  await connection.close();
-  return result.rows;
+  return await Schedule.find(
+    {},
+    "arrivalTime departureTime frequency trainId"
+  )
+    .sort({ arrivalTime: 1 }) // Sort by arrival time
+    .lean();
 };
+
+module.exports = Schedule;
