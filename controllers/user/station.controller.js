@@ -5,6 +5,7 @@ const Schedule = require("../../models/user/schedule.model");
 exports.getStations = async (req, res) => {
   try {
     const stations = await Station.getAllStations();
+    // Just return the full array of objects
     res.json(stations);
   } catch (err) {
     res.status(500).json({ error: err.message });

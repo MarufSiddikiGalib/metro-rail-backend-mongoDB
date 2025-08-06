@@ -1,17 +1,33 @@
-const getConnection = require("../../config/db");
+const mongoose = require("mongoose");
 
+// Models for collections
+const StationRoute = mongoose.models.StationRoute || mongoose.model(
+  "StationRoute",
+  new mongoose.Schema({
+    StationId: mongoose.Schema.Types.ObjectId,
+    RouteId: Number,
+  }),
+  "stationroutes"
+);
+
+const RouteDetails = mongoose.models.RouteDetails || mongoose.model(
+  "RouteDetails",
+  new mongoose.Schema({
+    RouteId: Number,
+    TotalDistance: Number,
+  }),
+  "routedetails"
+);
+
+// Get total distance for a station via StationRoute + RouteDetails
 exports.getStationDistance = async (stationId) => {
-  const connection = await getConnection();
-  const result = await connection.execute(
-    `SELECT rd.TotalDistance
-     FROM StationRoute sr
-     JOIN RouteDetails rd ON sr.RouteId = rd.RouteId
-     WHERE sr.StationId = :stationId`,
-    [stationId]
-  );
-  await connection.close();
-  if (result.rows.length) {
-    return result.rows[0][0];
-  }
-  throw new Error("Station or route not found.");
+  // Find the route for this station
+  const sr = await StationRoute.findOne({ StationId: new mongoose.Types.ObjectId(stationId) }).lean();
+  if (!sr) throw new Error("No route for station");
+
+  // Get the route's distance
+  const rd = await RouteDetails.findOne({ RouteId: sr.RouteId }).lean();
+  if (!rd) throw new Error("No route details for route");
+
+  return rd.TotalDistance;
 };
