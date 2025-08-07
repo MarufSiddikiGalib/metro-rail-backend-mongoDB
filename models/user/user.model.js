@@ -1,23 +1,24 @@
-const getConnection = require("../../config/db");
+const mongoose = require("mongoose");
+
+// User schema for MongoDB Atlas
+const userSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },
+  // Store hashed password
+  password: { type: String, required: true },
+}, { collection: "users" });
+
+const User = mongoose.models.User || mongoose.model("User", userSchema);
 
 // Find user by username
 exports.findByUsername = async (username) => {
-  const connection = await getConnection();
-  const result = await connection.execute(
-    'SELECT * FROM "User" WHERE Username = :username',
-    [username]
-  );
-  await connection.close();
-  return result.rows[0];
+  return await User.findOne({ username });
 };
 
 // Create a new user
 exports.createUser = async (username, hashedPassword) => {
-  const connection = await getConnection();
-  await connection.execute(
-    'INSERT INTO "User" (UserId, Username, Password) VALUES (seq_UserId.NEXTVAL, :username, :password)',
-    [username, hashedPassword],
-    { autoCommit: true }
-  );
-  await connection.close();
+  const user = new User({ username, password: hashedPassword });
+  return await user.save();
 };
+
+// For completeness, export model (may be useful for population, etc.)
+exports.User = User;
