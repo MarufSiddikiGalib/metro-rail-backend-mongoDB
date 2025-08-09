@@ -1,5 +1,6 @@
-const ticketService = require("../../services/user/ticket.service");
-const { generateTicketPDF } = require("../../utils/ticketPdf"); // Import the PDF/QR generator
+const Ticket = require("../../models/user/ticket.model");
+const { Passenger, registerPassenger } = require("../../models/user/passenger.model");
+const { generateTicketPDF } = require("../../utils/ticketPdf"); // Implement this as needed
 
 exports.buyTicket = async (req, res) => {
   try {
@@ -14,24 +15,26 @@ exports.buyTicket = async (req, res) => {
       destinationStation
     } = req.body;
 
-    // Basic validation
+    // Validate input
     if (
-      !type1 ||
-      !type2 ||
-      !passengerId ||
-      !reservationDate ||
-      !reservationTime ||
-      fare === undefined ||
-      !departureStation ||
-      !destinationStation
+      !type1 || !type2 || !passengerId || !reservationDate ||
+      !reservationTime || fare === undefined ||
+      !departureStation || !destinationStation
     ) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
-    const ticketDetails = await ticketService.generateTicket({
+    // Ensure passenger exists
+    const passenger = await Passenger.findById(passengerId);
+    if (!passenger) {
+      return res.status(404).json({ error: "Passenger not found" });
+    }
+
+    // Create ticket
+    const ticket = await Ticket.create({
       type1,
       type2,
-      passengerId,
+      passenger: passenger._id,
       reservationDate,
       reservationTime,
       fare,
@@ -39,26 +42,28 @@ exports.buyTicket = async (req, res) => {
       destinationStation
     });
 
-   // 2. Generate PDF with embedded QR code
-   const pdfBuffer = await generateTicketPDF(ticketDetails);
+    // Prepare ticket details for PDF and response
+    const ticketDetails = {
+      ticketNumber: ticket._id,
+      type1,
+      type2,
+      passengerId: passenger._id,
+      passengerName: passenger.name,
+      reservationDate,
+      reservationTime,
+      fare,
+      departureStation,
+      destinationStation
+    };
 
-   // 3. Respond with ticket info and PDF (base64 for frontend, or download for browser)
-   res.status(201).json({
-     ...ticketDetails,
-     ticketPdfBase64: pdfBuffer.toString('base64') // For direct browser download or display
-   });
+    // Generate ticket PDF (implement this utility as needed)
+    const pdfBuffer = await generateTicketPDF(ticketDetails);
 
-   // Optional: For direct PDF download in browser, set headers and send the buffer:
-   /*
-   res.set({
-     'Content-Type': 'application/pdf',
-     'Content-Disposition': `attachment; filename="ticket_${ticketDetails.ticketNumber}.pdf"`,
-     'Content-Length': pdfBuffer.length,
-   });
-   res.send(pdfBuffer);
-   */
-
- } catch (err) {
-   res.status(500).json({ error: err.message });
- }
+    res.status(201).json({
+      ...ticketDetails,
+      ticketPdfBase64: pdfBuffer.toString("base64")
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };

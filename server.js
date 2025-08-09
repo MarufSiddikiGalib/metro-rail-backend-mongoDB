@@ -15,6 +15,10 @@ const StationRoutes = require("./routes/station.routes"); // ✅ station routes
 const stationRoutes = require("./routes/user/station.routes"); // <== Station routes user 
 const fareRoutes = require("./routes/user/fare.routes"); // <== User Fare routes
 const userAuthRoutes = require("./routes/user/auth.routes"); // <== User Auth routes
+const passengerRegRoutes = require("./routes/user/passenger.routes"); // Passenger resistration while buying a ticket
+const ticketRoutes = require("./routes/user/ticket.routes"); // <== User Fare routes
+const ticketPdfRoutes = require("./routes/user/ticketPdf.routes"); // <== User Ticket PDF routes
+const transactionRoutes = require("./routes/user/transaction.routes"); // <== Transaction routes
 
 
 // Load env variables
@@ -43,9 +47,10 @@ app.use("/api/station", StationRoutes); // <== Admin Station routes
 app.use("/api/stations", stationRoutes); // <== User Station routes
 app.use("/api/fare", fareRoutes); // <== User Fare routes
 app.use("/api/user", userAuthRoutes); // <== User Auth routes
-
-
-
+app.use("/api/passenger-registration", passengerRegRoutes); // <== Passenger registration routes
+app.use("/api/ticket", ticketRoutes); // <== User Ticket routes
+app.use("/api/ticket", ticketPdfRoutes); // <== User Ticket PDF routes
+app.use("/api/transactions", transactionRoutes); // <== Transaction routes
 
 // Example route
 app.get("/", (req, res) => {

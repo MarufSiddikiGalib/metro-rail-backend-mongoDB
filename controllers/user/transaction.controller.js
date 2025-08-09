@@ -1,47 +1,66 @@
-const getConnection = require("../../config/db");
+const mongoose = require("mongoose");
 
-// GET all transactions
-exports.getAllTransaction = async (req, res) => {
+// --- Model code inside this controller file ---
+const transactionSchema = new mongoose.Schema({
+  amount: { type: Number, required: true },
+  paymentDate: { type: Date, required: true },
+  paymentMethod1: { type: String, required: true },
+  paymentMethod2: { type: String },
+  ticketNumber: { type: mongoose.Schema.Types.ObjectId, ref: "Ticket", required: true },
+});
+const Transaction = mongoose.models.Transaction || mongoose.model("Transaction", transactionSchema);
+
+// --- Controller functions ---
+
+// Get all transactions
+exports.getAllTransactions = async (req, res) => {
   try {
-    const conn = await getConnection();
-    const result = await conn.execute(
-      `SELECT TransactionId, Amount, PaymentDate, PaymentMethod1, PaymentMethod2, TicketNumber 
-       FROM TransactionTicket 
-       ORDER BY TransactionId DESC`
-    );
-    await conn.close();
-    res.json(result.rows);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    const transactions = await Transaction.find();
+    res.status(200).json(transactions);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };
 
-// CREATE/store transaction
+// Get a single transaction by ID
+exports.getTransactionById = async (req, res) => {
+  try {
+    const transaction = await Transaction.findById(req.params.id);
+    if (!transaction) {
+      return res.status(404).json({ error: "Transaction not found" });
+    }
+    res.status(200).json(transaction);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Create a new transaction
 exports.createTransaction = async (req, res) => {
   try {
     const { amount, paymentDate, paymentMethod1, paymentMethod2, ticketNumber } = req.body;
 
-    // Optional: check for ticket existence here if you want strict FK validation
+    if (
+      amount === undefined ||
+      !paymentDate ||
+      !paymentMethod1 ||
+      !ticketNumber
+    ) {
+      return res.status(400).json({ error: "All required fields must be provided" });
+    }
 
-    const conn = await getConnection();
-    const result = await conn.execute(
-      `INSERT INTO TransactionTicket
-        (TransactionId, Amount, PaymentDate, PaymentMethod1, PaymentMethod2, TicketNumber)
-        VALUES (seq_TransactionTicketId.NEXTVAL, :amount, TO_DATE(:paymentDate, 'YYYY-MM-DD'), :paymentMethod1, :paymentMethod2, :ticketNumber)
-        RETURNING TransactionId INTO :outId`,
-      {
-        amount,
-        paymentDate,
-        paymentMethod1,
-        paymentMethod2,
-        ticketNumber,
-        outId: { dir: require('oracledb').BIND_OUT, type: require('oracledb').NUMBER }
-      },
-      { autoCommit: true }
-    );
-    await conn.close();
-    res.status(201).json({ TransactionId: result.outBinds.outId[0] });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    const transaction = new Transaction({
+      amount,
+      paymentDate,
+      paymentMethod1,
+      paymentMethod2,
+      ticketNumber,
+    });
+
+    const savedTransaction = await transaction.save();
+    res.status(201).json(savedTransaction);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };
+
