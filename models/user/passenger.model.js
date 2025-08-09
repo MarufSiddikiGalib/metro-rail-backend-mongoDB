@@ -1,18 +1,20 @@
-const getConnection = require("../../config/db");
-const oracledb = require('oracledb');
+const mongoose = require("mongoose");
 
-// Insert new passenger and return the generated ID
-exports.registerPassenger = async (name, address) => {
-  const connection = await getConnection();
-  // Adjust SQL for your DB flavor (Oracle/MySQL/PostgreSQL)
-  const result = await connection.execute(
-   `INSERT INTO Passengers (PassengerId, Name, Address)
-     VALUES (seq_PassengerId.NEXTVAL, :name, :address)
-     RETURNING PassengerId INTO :id`,
-    {name, address, id: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER }},
-    { autoCommit: true }
-  );
-  const passengerId = result.outBinds.id[0];
-  await connection.close();
-  return passengerId;
+// Define Passenger schema for MongoDB
+const passengerSchema = new mongoose.Schema({
+  NAME: { type: String, required: true },
+  ADDRESS: { type: String, required: true },
+}, { collection: "passengers" });
+
+// Create Passenger model
+const Passenger = mongoose.models.Passenger || mongoose.model("Passenger", passengerSchema);
+
+// Register a new passenger and return the generated _id
+exports.registerPassenger = async (NAME, ADDRESS) => {
+  const passenger = new Passenger({ NAME, ADDRESS });
+  const saved = await passenger.save();
+  // Return MongoDB _id as passengerId (string)
+  return saved._id.toString();
 };
+
+exports.Passenger = Passenger;

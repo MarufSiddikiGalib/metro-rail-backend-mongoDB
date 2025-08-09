@@ -26,7 +26,7 @@ async function generateTicketPDF(ticket) {
 
  
   doc.fontSize(22).text('Metro Rail Ticket', { align: 'center' });
-  doc.image('../client/public/metro.jpg', { width: 100, align: 'left'}); // Adjust path to your logo
+  doc.image('../metro-rail-frontend-mongoDB/public/metro.jpg', { width: 100, align: 'left'}); // Adjust path to your logo
 
   doc.moveDown();
   doc.fontSize(14).text(`Ticket Number: ${ticket.ticketNumber}`);
