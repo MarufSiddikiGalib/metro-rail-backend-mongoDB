@@ -48,7 +48,7 @@ exports.buyTicket = async (req, res) => {
       type1,
       type2,
       passengerId: passenger._id,
-      passengerName: passenger.name,
+      passengerName: passenger.NAME,
       reservationDate,
       reservationTime,
       fare,

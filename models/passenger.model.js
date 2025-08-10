@@ -1,41 +1,31 @@
 const mongoose = require("mongoose");
 
-// Mongoose schema for Passengers
 const passengerSchema = new mongoose.Schema({
-  NAME: {
-    type: String,
-    required: true,
-  },
-  ADDRESS: {
-    type: String,
-    required: true,
-  },
+  NAME: { type: String, required: true },
+  ADDRESS: { type: String, required: true },
 });
 
-// Model: Passenger
 const Passenger = mongoose.model("Passenger", passengerSchema);
 
-// 🔁 Get all passengers, sorted by creation order
-exports.getAllPassengers = async () => {
+// Helper functions
+async function getAllPassengers() {
   return await Passenger.find().sort({ _id: 1 });
-};
-
-// 🆕 Create a new passenger
-exports.createPassenger = async (NAME, ADDRESS) => {
+}
+async function createPassenger(NAME, ADDRESS) {
   const newPassenger = new Passenger({ NAME, ADDRESS });
   return await newPassenger.save();
-};
-
-// ✏️ Update a passenger by ID
-exports.updatePassenger = async (id, NAME, ADDRESS) => {
-  return await Passenger.findByIdAndUpdate(
-    id,
-    { NAME, ADDRESS },
-    { new: true }
-  );
-};
-
-// ❌ Delete a passenger by ID
-exports.deletePassenger = async (id) => {
+}
+async function updatePassenger(id, NAME, ADDRESS) {
+  return await Passenger.findByIdAndUpdate(id, { NAME, ADDRESS }, { new: true });
+}
+async function deletePassenger(id) {
   return await Passenger.findByIdAndDelete(id);
+}
+
+module.exports = {
+  Passenger,         // <-- The Mongoose model
+  getAllPassengers,
+  createPassenger,
+  updatePassenger,
+  deletePassenger,
 };
