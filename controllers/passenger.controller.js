@@ -1,9 +1,9 @@
-const passengerModel = require("../models/passenger.model");
+const { getAllPassengers, createPassenger, updatePassenger, deletePassenger } = require("../models/passenger.model");
 
 // Get all passengers
 exports.getAllPassengers = async (req, res) => {
   try {
-    const data = await passengerModel.getAllPassengers();
+    const data = await getAllPassengers();
     res.json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });
