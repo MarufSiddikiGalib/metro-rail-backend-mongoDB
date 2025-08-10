@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { isTokenBlacklisted } = require("../utils/tokenBlacklist");
+// const { isTokenBlacklisted } = require("../utils/tokenBlacklist");
 
 module.exports = async (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -10,9 +10,9 @@ module.exports = async (req, res, next) => {
   const token = authHeader.split(" ")[1];
 
 // Blacklist Token Check
-  if (await isTokenBlacklisted(token)) {
-    return res.status(401).json({ error: "Token is blacklisted" });
-  }
+  // if (await isTokenBlacklisted(token)) {
+  //   return res.status(401).json({ error: "Token is blacklisted" });
+  // }
 
 
 
