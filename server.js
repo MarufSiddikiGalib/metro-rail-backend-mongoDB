@@ -32,12 +32,11 @@ const app = express();
 
 app.use(cors({
   origin: [
-     // your React or frontend dev server
-  //credentials: true // only if you use cookies or sessions
-    "http://localhost:3000",
-    "https://metro-rail-frontend-20-git-main-maruf-siddiki-galibs-projects.vercel.app", // for deployed frontend
-    "https://metro-rail-frontend-20.vercel.app/", // for deployed frontend
-  ]
+    'http://localhost:3000',
+    'https://metro-rail-frontend-20.vercel.app',
+    'https://metro-rail-frontend-20-git-main-maruf-siddiki-galibs-projects.vercel.app'
+  ],
+  credentials: true, // if you use cookies
 }));
 
 app.use(express.json()); // to parse JSON body
