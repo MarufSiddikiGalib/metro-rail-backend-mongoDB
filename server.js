@@ -33,7 +33,7 @@ const app = express();
 app.use(cors({
   origin: [
     'http://localhost:3000',
-    'https://metro-rail-frontend-20.vercel.app',
+    'https://metro-rail-2.vercel.app/',
     'https://metro-rail-frontend-20-git-main-maruf-siddiki-galibs-projects.vercel.app'
   ],
   credentials: true, // if you use cookies
