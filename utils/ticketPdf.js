@@ -38,6 +38,9 @@ async function generateTicketPDF(ticket) {
   doc.text(`From: ${ticket.departureStation}`);
   doc.text(`To: ${ticket.destinationStation}`);
   doc.text(`Fare: ${ticket.fare} BDT`);
+
+  doc.font('Helvetica-Bold').fillColor('red').fontSize(14).text('Scan the QR code below to verify this ticket');
+
   doc.moveDown();
 
   // 3. Add QR code image
